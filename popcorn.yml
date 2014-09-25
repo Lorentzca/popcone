@@ -1,0 +1,82 @@
+- hosts: popcorn
+  user: root
+  sudo: yes
+  tasks:
+    - name: install libselinux-python
+      yum: name=libselinux-python
+
+    - name: disable selinux
+      selinux: state=disabled
+
+    - name: install vim
+      yum: name=vim
+
+    - name: install tree
+      yum: name=tree
+
+    - name: install nginx
+      yum: name=http://nginx.org/packages/centos/6/x86_64/RPMS/nginx-1.6.1-1.el6.ngx.x86_64.rpm state=present
+
+    - name: start and enable boot nginx
+      service: name=nginx state=started enabled=yes
+
+    - name: nginx wordpress configure
+      template: src=./popcorn.conf dest=/etc/nginx/conf.d/popcorn.conf owner=root group=root mode=0644
+      notify:
+        - reload nginx
+
+    - name: install mysql-server
+      yum: name=mysql-server
+
+    - name: start and enable boot mysqld
+      service: name=mysqld state=started enabled=yes
+
+    - name: install MySQL-python
+      yum: name=MySQL-python
+
+    - name: create mysql wordpress user
+      mysql_user: name=wordpress_user password=wordpress_pass priv=*.*:ALL state=present
+
+    - name: create mysql wordpress database
+      mysql_db: name=wordpress_db
+
+    - name: install php
+      yum: name=php 
+
+    - name: install php-mysql
+      yum: name=php-mysql
+
+    - name: isntall php-mbstring
+      yum: name=php-mbstring
+
+    - name: install php-gd
+      yum: name=php-gd
+
+    - name: install php-xml
+      yum: name=php-xml
+
+    - name: install php-fpm
+      yum: name=php-fpm
+
+    - name: start and enable boot php-fpm
+      service: name=php-fpm state=started enabled=yes
+
+    - name: download wordpress
+      get_url: url=http://ja.wordpress.org/wordpress-3.9.2-ja.tar.gz dest=/var/tmp/
+
+    - name: unarchive wordpress
+      command: tar xvfz /var/tmp/wordpress-3.9.2-ja.tar.gz -C /var/www/html/
+
+    - name: set wordpress dir parmission
+      command: chmod -R 755    /var/www/html/wordpress
+
+    - name: set wordpress owner and group
+      command: chown -R nginx. /var/www/html/wordpress
+
+    - name: set wordpress config file
+      template: src=./wp-config.php dest=/var/www/html/wordpress/wp-config.php mode=0644
+
+  handlers:
+    - name: reload nginx
+      service: name=nginx state=reloaded
+
