@@ -22,7 +22,7 @@ Digitaloceanのトークン、鍵IDの設定をpopcorn.tfに書く(set variables
 
     $ ansible-playbook -i hosts popcorn.yml --user=root --private-key=~/.ssh/id_rsa
 
-## アクセス
+## access
 
 /etc/hostsに以下を追記
 
@@ -35,3 +35,12 @@ Digitaloceanのトークン、鍵IDの設定をpopcorn.tfに書く(set variables
 ログイン(鍵を登録してある場合パスワード認証はできない)
 
     $ ssh -i ~/.ssh/id_rsa root@popcorn
+
+## todo?
+
+- トークン、鍵ID、ドロップレットのスペック、鍵ファイルの名前を外部ファイル参照させる
+- playbook実行時毎回wordpressダウンロードして展開して設置する気がするのでやだ
+- terraform applyするたびhostsにどんどん溜まっていくのがやだ 
+- 全てが同じ階層にある
+- テスト無い(移植元にはある)
+- 等々
